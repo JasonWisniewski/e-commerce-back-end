@@ -1,10 +1,20 @@
 const router = require('express').Router();
+const { RENDER } = require('ci-info');
 const { Category, Product } = require('../../models');
 
 // The `/api/categories` endpoint
 
 router.get('/', (req, res) => {
-  // find all categories
+  Category.findAll({
+    include: [
+      Product
+    ]
+  }).then(dbApiData => res.json(dbApiData))
+  .catch(err => {
+    console.log(err);
+    // if we do not return an error we will get a 200 success
+    res.status(500).json(err);
+  });
   // be sure to include its associated Products
 });
 
