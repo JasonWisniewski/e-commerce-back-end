@@ -7,11 +7,10 @@ const { Category, Product } = require("../../models");
 
 router.get("/", (req, res) => {
   Category.findAll({
-    include: [
+    include:
       {
-        model: Product,
-      },
-    ],
+        model: Product
+      }
   })
     .then((dbApiData) => res.json(dbApiData))
     .catch((err) => {
@@ -30,7 +29,6 @@ router.get("/:id", (req, res) => {
     },
     include: {
       model: Product,
-      attributes: ["id", "product_name", "price"],
     },
   })
     .then((dbIdData) => res.json(dbIdData))

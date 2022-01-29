@@ -1,16 +1,50 @@
 const router = require('express').Router();
+const { doesNotMatch } = require('assert');
 const { Product, Category, Tag, ProductTag } = require('../../models');
 
 // The `/api/products` endpoint
 
 // get all products
 router.get('/', (req, res) => {
+  Product.findAll({
+    include: [{
+      model: Category
+    },
+    { 
+      model: Tag,
+      through: ProductTag
+    }
+    ]
+  })
+  .then((dbProductData) => res.json(dbProductData))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
   // find all products
   // be sure to include its associated Category and Tag data
 });
 
 // get one product
 router.get('/:id', (req, res) => {
+  Product.findOne({
+    where: {
+      id: req.params.id
+    },
+    include: {
+      model: Tag,
+      through: ProductTag,
+      attributes: ['id','tag_name']
+    },
+    include: {
+      model: Category
+    }
+  })
+  .then((dbIdData) => res.json(dbIdData))
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json(err);
+    });
   // find a single product by its `id`
   // be sure to include its associated Category and Tag data
 });
@@ -90,6 +124,22 @@ router.put('/:id', (req, res) => {
 });
 
 router.delete('/:id', (req, res) => {
+  Product.destroy({
+    where: {
+      id: req.params.id
+    }
+  })
+  .then(dbProdData => {
+    if (!dbProdData) {
+      res.status(404).json({ message: 'No category found with this id' });
+      return;
+    }
+    res.json(dbProdData);
+  })
+  .catch(err => {
+    console.log(err);
+    res.status(500).json(err);
+  });
   // delete one product by its `id` value
 });
 
